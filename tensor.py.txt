@@ -47,3 +47,4 @@ print('mean squared error:',mae)
 #d
 print("predict values:",pred_y.flatten())
 print("real values:",y_val)
+print("accurcy:",pred_y)
