@@ -1,0 +1,49 @@
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_absolute_error
+
+(x_train,y_train),(x_val,y_val)=keras.datasets.boston_housing.load_data()
+
+def creat_model(hidden_layers,neurons_per_layer):
+    model=keras.Sequential()
+    model.add(layers.Dense(neurons_per_layer,activation='relu',input_shape=(x_train.shape[1],)))
+    for i in range(hidden_layers):
+        model.add(layers.Dense(neurons_per_layer,activation='relu'))
+        model.add(layers.Dense(1))
+        model.compile(optimizer='adam',loss='mean_squared_error',metrics=['mae'])
+        return model 
+hidden_layers=[1,2,3]
+neurons_per_layer=[32,64,128]
+for hidden in hidden_layers:
+    for neurons in neurons_per_layer:
+        model=creat_model(hidden,neurons)
+        model.fit(x_train,y_train,epochs=100,validation_data=(x_val,y_val))
+        pred_y=model.predict(x_val)
+#b
+def plot_history(history):
+    plt.figure(figsize=(10,5))
+    plt.xlabel('epoch')
+    plt.ylabel('mean squared [1000%]')
+    plt.subplot(1,2,1)
+    plt.plot(history.epoch,np.array(history.history['mae']),label='train_mae')
+    plt.plot(history.epoch,np.array(history.history['val_mae']),label='values_mae')
+    plt.legend()
+    plt.xlabel('epoch')
+    plt.ylabel('mean squared [1000%]')
+    plt.subplot(1,2,2)
+    plt.plot(history.epoch,np.array(history.history['loss']),label='train_loss')
+    plt.plot(history.epoch,np.array(history.history['val_loss']),label='values_loss')
+    plt.legend()
+    plt.show()
+    plot_history(history)
+mse=mean_absolute_error(y_val,pred_y)
+print('mean absolute error:',mse)
+mae=mean_squared_error(y_val,pred_y)
+print('mean squared error:',mae)
+#d
+print("predict values:",pred_y.flatten())
+print("real values:",y_val)
